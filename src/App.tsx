@@ -20,8 +20,10 @@ export const App: React.FC = () => {
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [loadingTodo, setLoadingTodo] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const editingInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isLoading) {
@@ -63,7 +65,10 @@ export const App: React.FC = () => {
         setIsLoading(true);
         setTodosList(todos => todos.filter(todo => todo.id !== postId));
       })
-      .catch(() => setErrorMessage('Unable to delete a todo'))
+      .catch(() => {
+        setErrorMessage('Unable to delete a todo');
+        editingInputRef.current?.focus();
+      })
       .finally(() => {
         setIsLoading(false);
         setLoadingTodo(prev => prev.filter(id => id !== postId));
@@ -100,7 +105,7 @@ export const App: React.FC = () => {
     const { id } = updatedTodo;
     const previousTodos = [...todosList];
 
-    setLoadingTodo(prev => (prev.includes(id) ? prev : [...prev, id]));
+    setLoadingTodo(prev => [...prev, id]);
 
     try {
       await updatePost(updatedTodo);
@@ -115,6 +120,37 @@ export const App: React.FC = () => {
       setTodosList(previousTodos);
     } finally {
       setLoadingTodo(prev => prev.filter(prevId => prevId !== id));
+    }
+  };
+
+  const handleSubmit = async (
+    event: React.FormEvent,
+    query: string,
+    setQuery: (event: string) => void,
+  ) => {
+    event.preventDefault();
+
+    if (!query.trim()) {
+      setErrorMessage('Title should not be empty');
+
+      return;
+    }
+
+    const newTodo = {
+      title: query.trim(),
+      userId: 0,
+      completed: false,
+    };
+
+    try {
+      setIsLoading(true);
+      await addPost(newTodo);
+      setQuery('');
+      setErrorMessage('');
+    } catch {
+      setErrorMessage('Unable to add a todo');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -156,6 +192,7 @@ export const App: React.FC = () => {
           toggleAllCompleted={toggleAllCompleted}
           allActiveTodo={allActiveTodo}
           todosList={todosList}
+          handleSubmit={handleSubmit}
         />
 
         <TodoList
@@ -163,6 +200,9 @@ export const App: React.FC = () => {
           deletePost={deletePost}
           loadingTodo={loadingTodo}
           changePost={changePost}
+          editingInputRef={editingInputRef}
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
         />
 
         {tempTodo && <TempTodo todo={tempTodo} loadingTodo={loadingTodo} />}

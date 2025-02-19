@@ -12,6 +12,11 @@ interface Props {
   toggleAllCompleted: (toggle: boolean) => void;
   allActiveTodo: boolean;
   todosList: Todo[];
+  handleSubmit: (
+    event: React.FormEvent,
+    query: string,
+    setQuery: (event: string) => void,
+  ) => void;
 }
 
 export const Header: React.FC<Props> = ({
@@ -23,22 +28,25 @@ export const Header: React.FC<Props> = ({
   toggleAllCompleted,
   allActiveTodo,
   todosList,
+  handleSubmit,
 }) => {
   const [query, setQuery] = useState('');
 
   return (
     <header className="todoapp__header">
       {/* this button should have `active` class only if all todos are completed */}
-      <button
-        type="button"
-        className={classNames('todoapp__toggle-all', {
-          active: allActiveTodo,
-        })}
-        data-cy="ToggleAllButton"
-        onClick={() => {
-          toggleAllCompleted(todosList.some(todo => !todo.completed));
-        }}
-      />
+      {todosList.length > 0 && (
+        <button
+          type="button"
+          className={classNames('todoapp__toggle-all', {
+            active: allActiveTodo,
+          })}
+          data-cy="ToggleAllButton"
+          onClick={() => {
+            toggleAllCompleted(todosList.some(todo => !todo.completed));
+          }}
+        />
+      )}
 
       {/* Add a todo on form submit */}
       <TodosForm
@@ -49,6 +57,7 @@ export const Header: React.FC<Props> = ({
         setIsLoading={setIsLoading}
         isLoading={isLoading}
         inputRef={inputRef}
+        handleSubmit={handleSubmit}
       />
     </header>
   );

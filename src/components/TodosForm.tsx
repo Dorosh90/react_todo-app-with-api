@@ -8,56 +8,22 @@ interface Props {
   setIsLoading: (loading: boolean) => void;
   isLoading: boolean;
   inputRef: React.RefObject<HTMLInputElement>;
+  handleSubmit: (
+    event: React.FormEvent,
+    query: string,
+    setQuery: (event: string) => void,
+  ) => void;
 }
 
 export const TodosForm: React.FC<Props> = ({
   query,
   setQuery,
-  addPost,
-  setErrorMessage,
-  setIsLoading,
   isLoading,
   inputRef,
+  handleSubmit,
 }) => {
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    if (!query.trim()) {
-      setErrorMessage('Title should not be empty');
-
-      return;
-    }
-
-    const newTodo = {
-      title: query.trim(),
-      userId: 0,
-      completed: false,
-    };
-
-    // addPost(newTodo)
-    //   .then(() => {
-    //     setErrorMessage('');
-    //   })
-    //   .finally(() => {
-    //     setQuery('');
-    //     setIsLoading(false);
-    //     inputRef.current?.focus();
-    //   });
-
-    try {
-      setIsLoading(true);
-      await addPost(newTodo);
-      setQuery('');
-      setErrorMessage('');
-    } catch {
-      setErrorMessage('Unable to add a todo');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={e => handleSubmit(e, query, setQuery)}>
       <input
         ref={inputRef}
         disabled={isLoading}
@@ -65,7 +31,6 @@ export const TodosForm: React.FC<Props> = ({
         data-cy="NewTodoField"
         type="text"
         className="todoapp__new-todo"
-        placeholder="What needs to be done?"
         onChange={event => setQuery(event.currentTarget.value)}
       />
     </form>

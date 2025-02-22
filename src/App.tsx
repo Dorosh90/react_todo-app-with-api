@@ -20,19 +20,26 @@ export const App: React.FC = () => {
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [loadingTodo, setLoadingTodo] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditForm, setIsEditForm] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const editingInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!isLoading) {
-      inputRef.current?.focus();
-    }
-  }, [isLoading]);
-
   const listOfActiveTodos = todosList.filter(todo => !todo.completed);
   const hasActiveTodo = todosList.some(todo => todo.completed);
   const allActiveTodo = todosList.every(todo => todo.completed);
+
+  useEffect(() => {
+    if (isEditForm) {
+      editingInputRef.current?.focus();
+
+      return;
+    }
+
+    if (!isLoading) {
+      inputRef.current?.focus();
+    }
+  }, [isLoading, isEditForm]);
 
   useEffect(() => {
     if (!errorMessage) {
@@ -116,6 +123,9 @@ export const App: React.FC = () => {
     } catch (error) {
       setErrorMessage('Unable to update a todo');
       setTodosList(previousTodos);
+      editingInputRef.current?.focus();
+      throw error;
+
     } finally {
       setLoadingTodo(prev => prev.filter(prevId => prevId !== id));
     }
@@ -199,6 +209,8 @@ export const App: React.FC = () => {
           loadingTodo={loadingTodo}
           changePost={changePost}
           editingInputRef={editingInputRef}
+          inputRef={inputRef}
+          setIsEditForm={setIsEditForm}
         />
 
         {tempTodo && <TempTodo todo={tempTodo} loadingTodo={loadingTodo} />}

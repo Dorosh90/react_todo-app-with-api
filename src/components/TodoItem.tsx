@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Todo } from '../types/Todo';
 import classNames from 'classnames';
 import { Loading } from './Loading';
@@ -9,6 +9,8 @@ interface Props {
   loadingTodo: number[];
   changePost: (updatedTodo: Todo) => Promise<void>;
   editingInputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement>;
+  setIsEditForm: (editForm: boolean) => void;
 }
 
 export const TodoItem: React.FC<Props> = ({
@@ -17,18 +19,14 @@ export const TodoItem: React.FC<Props> = ({
   loadingTodo,
   changePost,
   editingInputRef,
+  inputRef,
+  //setIsEditForm,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { id, completed, title } = todo;
   const [isEditing, setIsEditing] = useState(false);
 
   const [editText, setEditText] = useState(title);
-
-  useEffect(() => {
-    if (isEditing) {
-      editingInputRef.current?.focus();
-    }
-  }, [isEditing]);
 
   const handleSave = async () => {
     if (!editText.trim()) {
@@ -50,22 +48,15 @@ export const TodoItem: React.FC<Props> = ({
 
     setIsLoading(true);
 
-    changePost({ ...todo, title: editText.trim() })
-      .catch(() => {
-        setIsEditing(true);
-      })
-      .finally(() => editingInputRef.current?.focus());
-    // try {
-    //   await changePost();
-    // } catch {
-    //   //
-    //   setEditText(title);
-
-    //   return;
-    // }
-
-    setIsEditing(false);
-    setIsLoading(false);
+    try {
+      await changePost({ ...todo, title: editText.trim() });
+      setIsEditing(false);
+      setIsLoading(false);
+    } catch {
+      setIsEditing(true);
+      setIsLoading(false);
+      console.log('error todo');
+    }
   };
 
   const handleKeyDown = async (
@@ -123,7 +114,6 @@ export const TodoItem: React.FC<Props> = ({
           className="todo__title"
           onDoubleClick={() => {
             setIsEditing(true);
-            //console.log(isEditing + ' before change');
           }}
         >
           {title}
@@ -139,7 +129,7 @@ export const TodoItem: React.FC<Props> = ({
           data-cy="TodoDelete"
           onClick={() => {
             setIsLoading(true);
-            deletePost(id);
+            deletePost(id).finally(() => inputRef.current?.focus());
           }}
         >
           ×

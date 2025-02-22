@@ -37,9 +37,7 @@ export const TempTodo: React.FC<Props> = ({ todo, loadingTodo }) => {
         type="button"
         className="todo__remove"
         data-cy="TodoDelete"
-        onClick={() => {
-          setIsLoading(true);
-        }}
+        onClick={() => setIsLoading(true)}
       >
         ×
       </button>

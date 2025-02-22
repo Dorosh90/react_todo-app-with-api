@@ -63,7 +63,7 @@ export const App: React.FC = () => {
       });
   }, []);
 
-  function deletePost(postId: number): Promise<void> {
+  const deletePost = (postId: number): Promise<void> => {
     setLoadingTodo(prev => [...prev, postId]);
 
     return deleteTodo(postId)
@@ -79,7 +79,7 @@ export const App: React.FC = () => {
         setLoadingTodo(prev => prev.filter(id => id !== postId));
         inputRef.current?.focus();
       });
-  }
+  };
 
   const deleteCompletedTasks = () => {
     const completedTodos = todosList.filter(todo => todo.completed);

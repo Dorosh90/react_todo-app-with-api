@@ -33,10 +33,7 @@ export const TodoFooter: React.FC<Props> = ({
               selected: filter === filteredVaue,
             })}
             data-cy={`FilterLink${filteredVaue}`}
-            onClick={e => {
-              e.preventDefault();
-              setFilter(filteredVaue);
-            }}
+            onClick={() => setFilter(filteredVaue)}
           >
             {filteredVaue}
           </a>

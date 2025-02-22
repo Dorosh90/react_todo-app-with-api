@@ -111,9 +111,7 @@ export const TodoItem: React.FC<Props> = ({
         <span
           data-cy="TodoTitle"
           className="todo__title"
-          onDoubleClick={() => {
-            setIsEditing(true);
-          }}
+          onDoubleClick={() => setIsEditing(true)}
         >
           {title}
         </span>

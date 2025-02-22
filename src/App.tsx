@@ -20,7 +20,6 @@ export const App: React.FC = () => {
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [loadingTodo, setLoadingTodo] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const editingInputRef = useRef<HTMLInputElement>(null);
@@ -67,7 +66,6 @@ export const App: React.FC = () => {
       })
       .catch(() => {
         setErrorMessage('Unable to delete a todo');
-        editingInputRef.current?.focus();
       })
       .finally(() => {
         setIsLoading(false);
@@ -201,8 +199,6 @@ export const App: React.FC = () => {
           loadingTodo={loadingTodo}
           changePost={changePost}
           editingInputRef={editingInputRef}
-          isEditing={isEditing}
-          setIsEditing={setIsEditing}
         />
 
         {tempTodo && <TempTodo todo={tempTodo} loadingTodo={loadingTodo} />}

@@ -8,8 +8,6 @@ interface Props {
   loadingTodo: number[];
   changePost: (updatedTodo: Todo) => Promise<void>;
   editingInputRef: React.RefObject<HTMLInputElement>;
-  isEditing: boolean;
-  setIsEditing: (value: boolean) => void;
 }
 
 export const TodoList: React.FC<Props> = ({
@@ -18,8 +16,6 @@ export const TodoList: React.FC<Props> = ({
   loadingTodo,
   changePost,
   editingInputRef,
-  isEditing,
-  setIsEditing,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -34,8 +30,6 @@ export const TodoList: React.FC<Props> = ({
             loadingTodo={loadingTodo}
             changePost={changePost}
             editingInputRef={editingInputRef}
-            isEditing={isEditing}
-            setIsEditing={setIsEditing}
           />
         ))}
     </section>

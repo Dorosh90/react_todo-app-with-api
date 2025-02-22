@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Todo } from '../types/Todo';
 import classNames from 'classnames';
 import { Loading } from './Loading';
@@ -9,8 +9,6 @@ interface Props {
   loadingTodo: number[];
   changePost: (updatedTodo: Todo) => Promise<void>;
   editingInputRef: React.RefObject<HTMLInputElement>;
-  isEditing: boolean;
-  setIsEditing: (value: boolean) => void;
 }
 
 export const TodoItem: React.FC<Props> = ({
@@ -19,26 +17,27 @@ export const TodoItem: React.FC<Props> = ({
   loadingTodo,
   changePost,
   editingInputRef,
-  isEditing,
-  setIsEditing,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { id, completed, title } = todo;
+  const [isEditing, setIsEditing] = useState(false);
 
   const [editText, setEditText] = useState(title);
 
-  // useEffect(() => {
-  //   editingInputRef.current?.focus();
-  // }, [isEditing]);
+  useEffect(() => {
+    if (isEditing) {
+      editingInputRef.current?.focus();
+    }
+  }, [isEditing]);
 
   const handleSave = async () => {
     if (!editText.trim()) {
-      try {
-        await deletePost(id);
-      } catch {
-        setIsEditing(true);
-        setEditText(title);
-      }
+      deletePost(id)
+        .catch(() => {
+          setIsEditing(true);
+          setEditText(title);
+        })
+        .finally(() => editingInputRef.current?.focus());
 
       return;
     }
@@ -50,18 +49,23 @@ export const TodoItem: React.FC<Props> = ({
     }
 
     setIsLoading(true);
-    try {
-      await changePost({ ...todo, title: editText.trim() });
-    } catch {
-      setIsEditing(true);
-      setEditText(title);
 
-      return;
-    }
+    changePost({ ...todo, title: editText.trim() })
+      .catch(() => {
+        setIsEditing(true);
+      })
+      .finally(() => editingInputRef.current?.focus());
+    // try {
+    //   await changePost();
+    // } catch {
+    //   //
+    //   setEditText(title);
+
+    //   return;
+    // }
 
     setIsEditing(false);
     setIsLoading(false);
-    console.log(isEditing +' after change');
   };
 
   const handleKeyDown = async (
@@ -101,7 +105,7 @@ export const TodoItem: React.FC<Props> = ({
       {isEditing ? (
         <form onSubmit={e => e.preventDefault()}>
           <input
-            //ref={editingInputRef}
+            ref={editingInputRef}
             type="text"
             data-cy="TodoTitleField"
             className="todo__title-field"
@@ -119,7 +123,7 @@ export const TodoItem: React.FC<Props> = ({
           className="todo__title"
           onDoubleClick={() => {
             setIsEditing(true);
-            console.log(isEditing + ' before change');
+            //console.log(isEditing + ' before change');
           }}
         >
           {title}

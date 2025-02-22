@@ -55,7 +55,6 @@ export const TodoItem: React.FC<Props> = ({
     } catch {
       setIsEditing(true);
       setIsLoading(false);
-      console.log('error todo');
     }
   };
 

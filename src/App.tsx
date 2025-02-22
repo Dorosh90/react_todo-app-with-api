@@ -125,7 +125,6 @@ export const App: React.FC = () => {
       setTodosList(previousTodos);
       editingInputRef.current?.focus();
       throw error;
-
     } finally {
       setLoadingTodo(prev => prev.filter(prevId => prevId !== id));
     }
